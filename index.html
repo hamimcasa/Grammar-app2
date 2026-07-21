@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz des Temps Français | DuoStyle</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #58cc02;
+            --primary-dark: #46a302;
+            --secondary: #1cb0f6;
+            --secondary-dark: #1899d6;
+            --danger: #ff4b4b;
+            --danger-dark: #ea2b2b;
+            --background: #f7f7f7;
+            --surface: #ffffff;
+            --text-main: #4b4b4b;
+            --text-muted: #afafaf;
+            --border: #e5e5e5;
+            --border-bottom: #d5d5d5;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Nunito', sans-serif;
+            user-select: none;
+        }
+
+        body {
+            background-color: var(--background);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            direction: rtl;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 480px;
+            background-color: var(--surface);
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            border: 2px solid var(--border);
+            margin: 15px;
+        }
+
+        /* Header & Progress Bar */
+        .header {
+            padding: 20px 20px 10px 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .progress-bar-container {
+            flex-grow: 1;
+            height: 16px;
+            background-color: var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background-color: var(--primary);
+            width: 0%;
+            border-radius: 8px;
+            transition: width 0.4s ease;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-weight: 800;
+        }
+
+        /* Main Quiz Screen */
+        .quiz-body {
+            padding: 25px 20px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .tense-badge {
+            align-self: flex-start;
+            background-color: #ddf4ff;
+            color: var(--secondary-dark);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+
+        .question-title {
+            font-size: 20px;
+            font-weight: 800;
+            margin-bottom: 5px;
+            color: #3c3c3c;
+        }
+
+        .question-subtitle {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+        }
+
+        .example-box {
+            background-color: #fff9e6;
+            border: 2px solid #ffcc00;
+            border-radius: 12px;
+            padding: 12px 15px;
+            margin-bottom: 20px;
+            font-size: 15px;
+            direction: ltr;
+            text-align: left;
+        }
+
+        .example-box strong {
+            color: #b38600;
+            display: block;
+            font-size: 12px;
+            margin-bottom: 2px;
+            direction: rtl;
+            text-align: right;
+        }
+
+        /* Options Grid */
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .option-btn {
+            background-color: var(--surface);
+            border: 2px solid var(--border);
+            border-bottom: 4px solid var(--border-bottom);
+            border-radius: 16px;
+            padding: 15px 20px;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-main);
+            text-align: right;
+            cursor: pointer;
+            transition: all 0.1s ease;
+            direction: ltr;
+        }
+
+        .option-btn:hover {
+            background-color: #f7f7f7;
+        }
+
+        .option-btn.selected {
+            background-color: #ddf4ff;
+            border-color: var(--secondary);
+            border-bottom-color: var(--secondary-dark);
+            color: var(--secondary-dark);
+        }
+
+        .option-btn.correct {
+            background-color: #d7ffb8 !important;
+            border-color: var(--primary) !important;
+            border-bottom-color: var(--primary-dark) !important;
+            color: var(--primary-dark) !important;
+        }
+
+        .option-btn.incorrect {
+            background-color: #ffdfe0 !important;
+            border-color: var(--danger) !important;
+            border-bottom-color: var(--danger-dark) !important;
+            color: var(--danger-dark) !important;
+        }
+
+        /* Footer Feedback Panel */
+        .footer-feedback {
+            padding: 20px;
+            border-top: 2px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--surface);
+            transition: background-color 0.3s;
+        }
+
+        .footer-feedback.correct-bg {
+            background-color: #d7ffb8;
+            border-color: #b8f296;
+        }
+
+        .footer-feedback.incorrect-bg {
+            background-color: #ffdfe0;
+            border-color: #ffb8b8;
+        }
+
+        .feedback-message {
+            font-weight: 800;
+            font-size: 18px;
+        }
+
+        .footer-feedback.correct-bg .feedback-message {
+            color: var(--primary-dark);
+        }
+
+        .footer-feedback.incorrect-bg .feedback-message {
+            color: var(--danger-dark);
+        }
+
+        .action-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-bottom: 4px solid var(--primary-dark);
+            border-radius: 14px;
+            padding: 12px 30px;
+            font-size: 16px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: filter 0.1s;
+        }
+
+        .action-btn:hover {
+            filter: brightness(1.05);
+        }
+
+        .action-btn:active {
+            border-bottom-width: 2px;
+            transform: translateY(2px);
+        }
+
+        .action-btn.incorrect-btn {
+            background-color: var(--danger);
+            border-bottom-color: var(--danger-dark);
+        }
+
+        /* Results Screen */
+        .results-screen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            text-align: center;
+            flex-grow: 1;
+        }
+
+        .results-icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+        }
+
+        .results-title {
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .results-score {
+            font-size: 18px;
+            color: var(--text-muted);
+            margin-bottom: 30px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Header -->
+        <div class="header" id="quiz-header">
+            <button class="close-btn" onclick="restartQuiz()">✕</button>
+            <div class="progress-bar-container">
+                <div class="progress-bar-fill" id="progress-fill"></div>
+            </div>
+        </div>
+
+        <!-- Quiz Body -->
+        <div class="quiz-body" id="quiz-screen">
+            <div class="tense-badge" id="tense-badge">Présent de l'indicatif</div>
+            <div class="question-title">اختر التصريف أو الزمن المناسب للجملة:</div>
+            <div class="question-subtitle" id="question-prompt">أتمم الفراغ بالشكل الصحيح</div>
+
+            <div class="example-box" id="example-box">
+                <strong>مثال توضيحي على الزمن:</strong>
+                <span id="example-text">Je parle français tous les jours.</span>
+            </div>
+
+            <div class="options-grid" id="options-grid">
+                <!-- Dynamic Options -->
+            </div>
+        </div>
+
+        <!-- Feedback Footer -->
+        <div class="footer-feedback hidden" id="footer-feedback">
+            <div class="feedback-message" id="feedback-message">صحيح! ممتاز</div>
+            <button class="action-btn" id="next-btn" onclick="handleNextButton()">متابعة</button>
+        </div>
+
+        <!-- Results Screen -->
+        <div class="results-screen" id="results-screen">
+            <div class="results-icon">🏆</div>
+            <div class="results-title">انتهى الاختبار بنجاح!</div>
+            <div class="results-score" id="final-score-text">لقد أجبت على 0 من 0 إجابة صحيحة</div>
+            <button class="action-btn" onclick="restartQuiz()">إعادة الاختبار</button>
+        </div>
+    </div>
+
+    <script>
+        // بيانات الأزمنة الفرنسية كاملة مع الأمئلة وقواعدها وسؤال الكويز
+        const quizData = [
+            {
+                tense: "Présent de l'indicatif",
+                example: "Je parle français couramment chaque matin.",
+                exampleFr: "Je parle français couramment chaque matin.",
+                prompt: "أتمم الجملة في زمن المضارع (Présent):",
+                sentence: "Nous [...] (aimer) voyager en Europe.",
+                options: ["aimons", "aimez", "aiment", "aimons-nous"],
+                answer: "aimons"
+            },
+            {
+                tense: "Passé Composé",
+                example: "Hier, j'ai visité un musée magnifique à Paris.",
+                exampleFr: "Hier, j'ai visité un musée magnifique à Paris.",
+                prompt: "اختر التصريف الصحيح في الماضي المركب (Passé Composé):",
+                sentence: "Elle [...] (venir) avec nous hier soir.",
+                options: ["est venue", "a venu", "est venu", "a vendue"],
+                answer: "est venue"
+            },
+            {
+                tense: "Imparfait",
+                example: "Quand j'étais enfant, je jouais au football tous les jours.",
+                exampleFr: "Quand j'étais enfant, je jouais au football.",
+                prompt: "حدد التصريف المناسب في زمن الماضي المستمر (Imparfait):",
+                sentence: "Tu [...] (avoir) une belle voiture rouge autrefois.",
+                options: ["avais", "avais eu", "avais as", "aviez"],
+                answer: "avais"
+            },
+            {
+                tense: "Futur Simple",
+                example: "Demain, nous voyagerons vers une nouvelle destination.",
+                exampleFr: "Demain, nous voyagerons vers une nouvelle destination.",
+                prompt: "اختر التصريف الصحيح في المستقبل البسيط (Futur Simple):",
+                sentence: "Ils [...] (faire) leurs devoirs ce soir.",
+                options: ["feront", "faires", "font", "ferons"],
+                answer: "feront"
+            },
+            {
+                tense: "Futur Proche",
+                example: "Regarde ces nuages, il va pleuvoir bientôt.",
+                exampleFr: "Regarde ces nuages, il va pleuvoir bientôt.",
+                prompt: "اختر التعبير الأصح للمستقبل القريب (Futur Proche):",
+                sentence: "Je [...] (manger) un gâteau au chocolat.",
+                options: ["vais manger", "vais mange", "aller manger", "suis manger"],
+                answer: "vais manger"
+            },
+            {
+                tense: "Plus-que-parfait",
+                example: "Quand il est arrivé, le train était déjà parti.",
+                exampleFr: "Quand il est arrivé, le train était déjà parti.",
+                prompt: "اختر التصريف المناسب في زمن (Plus-que-parfait):",
+                sentence: "Nous [...] (finir) notre travail avant midi.",
+                options: avions_fini = ["avions fini", "étions finis", "avons fini", "avions finis"],
+                options: ["avions fini", "étions finis", "avons fini", "avions finis"],
+                answer: "avions fini"
+            },
+            {
+                tense: "Conditionnel Présent",
+                example: "Si j'avais de l'argent, j'achèterais une grande maison.",
+                exampleFr: "Si j'avais de l'argent, j'achèterais une grande maison.",
+                prompt: "اختر الفعل المناسب في صيغة الشرط المضارع (Conditionnel):",
+                sentence: "Tu [...] (pouvoir) m'aider s'il te plaît ?",
+                options: ["pourrais", "peux", "pourras", "pouvais"],
+                answer: "pourrais"
+            },
+            {
+                tense: "Subjonctif Présent",
+                example: "Il faut que tu étudies bien pour réussir ton examen.",
+                exampleFr: "Il faut que tu étudies bien pour réussir.",
+                prompt: "اختر التصريف الصحيح في صيغة الشك (Subjonctif):",
+                sentence: "Il faut que nous [...] (partir) maintenant.",
+                options: ["partions", "partons", "partiez", "partent"],
+                answer: "partions"
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let selectedOption = null;
+        let isAnswerSubmitted = false;
+
+        const progressFill = document.getElementById('progress-fill');
+        const tenseBadge = document.getElementById('tense-badge');
+        const questionPrompt = document.getElementById('question-prompt');
+        const exampleText = document.getElementById('example-text');
+        const optionsGrid = document.getElementById('options-grid');
+        const footerFeedback = document.getElementById('footer-feedback');
+        const feedbackMessage = document.getElementById('feedback-message');
+        const nextBtn = document.getElementById('next-btn');
+        const quizScreen = document.getElementById('quiz-screen');
+        const quizHeader = document.getElementById('quiz-header');
+        const resultsScreen = document.getElementById('results-screen');
+        const finalScoreText = document.getElementById('final-score-text');
+
+        function loadQuestion() {
+            isAnswerSubmitted = false;
+            selectedOption = null;
+            footerFeedback.classList.add('hidden');
+            footerFeedback.classList.remove('correct-bg', 'incorrect-bg');
+            nextBtn.textContent = "تحقق";
+            nextBtn.className = "action-btn";
+
+            const q = quizData[currentQuestionIndex];
+            
+            // تحديث شريط التقدم
+            const progressPercent = ((currentQuestionIndex) / quizData.length) * 100;
+            progressFill.style.width = `${progressPercent}%`;
+
+            tenseBadge.textContent = q.tense;
+            questionPrompt.innerHTML = `${q.prompt}<br><strong style="font-size: 22px; color: #2b2b2b; display: block; margin-top: 10px; direction: ltr; text-align: left;">${q.sentence}</strong>`;
+            exampleText.textContent = q.exampleFr;
+
+            // خلط الخيارات عشوائياً بطريقة بسيطة
+            const shuffledOptions = [...q.options].sort(() => Math.random() - 0.5);
+
+            optionsGrid.innerHTML = '';
+            shuffledOptions.forEach(option => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.textContent = option;
+                btn.onclick = () => selectOption(btn, option);
+                optionsGrid.appendChild(btn);
+            });
+        }
+
+        function selectOption(buttonElement, optionText) {
+            if (isAnswerSubmitted) return;
+
+            document.querySelectorAll('.option-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+
+            buttonElement.classList.add('selected');
+            selectedOption = optionText;
+        }
+
+        function handleNextButton() {
+            if (!selectedOption && !isAnswerSubmitted) {
+                alert('الرجاء اختيار إجابة أولاً!');
+                return;
+            }
+
+            if (!isAnswerSubmitted) {
+                // مرحلة التحقق من الإجابة
+                isAnswerSubmitted = true;
+                const currentQ = quizData[currentQuestionIndex];
+                const buttons = document.querySelectorAll('.option-btn');
+
+                let isCorrect = (selectedOption === currentQ.answer);
+
+                buttons.forEach(btn => {
+                    if (btn.textContent === currentQ.answer) {
+                        btn.classList.add('correct');
+                    } else if (btn.textContent === selectedOption && !isCorrect) {
+                        btn.classList.add('incorrect');
+                    }
+                });
+
+                if (isCorrect) {
+                    score++;
+                    footerFeedback.className = 'footer-feedback correct-bg';
+                    feedbackMessage.textContent = 'إجابة صحيحة! 🎉';
+                } else {
+                    footerFeedback.className = 'footer-feedback incorrect-bg';
+                    feedbackMessage.textContent = `إجابة خاطئة! الصواب هو: ${currentQ.answer}`;
+                }
+
+                footerFeedback.classList.remove('hidden');
+                nextBtn.textContent = "متابعة";
+                nextBtn.className = isCorrect ? "action-btn" : "action-btn incorrect-btn";
+
+            } else {
+                // الانتقال للسؤال الموالي أو النتائج
+                currentQuestionIndex++;
+                if (currentQuestionIndex < quizData.length) {
+                    loadQuestion();
+                } else {
+                    showResults();
+                }
+            }
+        }
+
+        function showResults() {
+            quizHeader.style.display = 'none';
+            quizScreen.style.display = 'none';
+            footerFeedback.style.display = 'none';
+            resultsScreen.style.display = 'flex';
+            finalScoreText.textContent = `لقد أجبت على ${score} من ${quizData.length} إجابة صحيحة بشكل ممتاز!`;
+        }
+
+        function restartQuiz() {
+            currentQuestionIndex = 0;
+            score = 0;
+            quizHeader.style.display = 'flex';
+            quizScreen.style.display = 'flex';
+            footerFeedback.style.display = 'flex';
+            resultsScreen.style.display = 'none';
+            loadQuestion();
+        }
+
+        // تشغيل التطبيق عند التحميل
+        window.onload = loadQuestion;
+    </script>
+</body>
+</html>
