@@ -52,7 +52,6 @@
             margin: 15px;
         }
 
-        /* Header & Progress Bar */
         .header {
             padding: 20px 20px 10px 20px;
             display: flex;
@@ -87,7 +86,6 @@
             font-weight: 800;
         }
 
-        /* Main Quiz Screen */
         .quiz-body {
             padding: 25px 20px;
             flex-grow: 1;
@@ -140,7 +138,6 @@
             text-align: right;
         }
 
-        /* Options Grid */
         .options-grid {
             display: grid;
             grid-template-columns: 1fr;
@@ -188,7 +185,6 @@
             color: var(--danger-dark) !important;
         }
 
-        /* Footer Feedback Panel */
         .footer-feedback {
             padding: 20px;
             border-top: 2px solid var(--border);
@@ -249,7 +245,6 @@
             border-bottom-color: var(--danger-dark);
         }
 
-        /* Results Screen */
         .results-screen {
             display: none;
             flex-direction: column;
@@ -260,23 +255,6 @@
             flex-grow: 1;
         }
 
-        .results-icon {
-            font-size: 60px;
-            margin-bottom: 20px;
-        }
-
-        .results-title {
-            font-size: 24px;
-            font-weight: 800;
-            margin-bottom: 10px;
-        }
-
-        .results-score {
-            font-size: 18px;
-            color: var(--text-muted);
-            margin-bottom: 30px;
-        }
-
         .hidden {
             display: none !important;
         }
@@ -285,7 +263,6 @@
 <body>
 
     <div class="container">
-        <!-- Header -->
         <div class="header" id="quiz-header">
             <button class="close-btn" onclick="restartQuiz()">✕</button>
             <div class="progress-bar-container">
@@ -293,112 +270,65 @@
             </div>
         </div>
 
-        <!-- Quiz Body -->
         <div class="quiz-body" id="quiz-screen">
             <div class="tense-badge" id="tense-badge">Présent de l'indicatif</div>
-            <div class="question-title">اختر التصريف أو الزمن المناسب للجملة:</div>
-            <div class="question-subtitle" id="question-prompt">أتمم الفراغ بالشكل الصحيح</div>
+            <div class="question-title">اختر التصريف الصحيح للجملة:</div>
+            <div class="question-subtitle" id="question-prompt"></div>
 
             <div class="example-box" id="example-box">
                 <strong>مثال توضيحي على الزمن:</strong>
-                <span id="example-text">Je parle français tous les jours.</span>
+                <span id="example-text"></span>
             </div>
 
-            <div class="options-grid" id="options-grid">
-                <!-- Dynamic Options -->
-            </div>
+            <div class="options-grid" id="options-grid"></div>
         </div>
 
-        <!-- Feedback Footer -->
         <div class="footer-feedback hidden" id="footer-feedback">
-            <div class="feedback-message" id="feedback-message">صحيح! ممتاز</div>
-            <button class="action-btn" id="next-btn" onclick="handleNextButton()">متابعة</button>
+            <div class="feedback-message" id="feedback-message"></div>
+            <button class="action-btn" id="next-btn" onclick="handleNextButton()">تحقق</button>
         </div>
 
-        <!-- Results Screen -->
         <div class="results-screen" id="results-screen">
-            <div class="results-icon">🏆</div>
-            <div class="results-title">انتهى الاختبار بنجاح!</div>
-            <div class="results-score" id="final-score-text">لقد أجبت على 0 من 0 إجابة صحيحة</div>
+            <div style="font-size: 60px; margin-bottom: 20px;">🏆</div>
+            <div style="font-size: 24px; font-weight: 800; margin-bottom: 10px;">انتهى الاختبار بنجاح!</div>
+            <div style="font-size: 16px; color: var(--text-muted); margin-bottom: 20px;" id="final-score-text"></div>
             <button class="action-btn" onclick="restartQuiz()">إعادة الاختبار</button>
         </div>
     </div>
 
     <script>
-        // بيانات الأزمنة الفرنسية كاملة مع الأمئلة وقواعدها وسؤال الكويز
         const quizData = [
             {
                 tense: "Présent de l'indicatif",
-                example: "Je parle français couramment chaque matin.",
                 exampleFr: "Je parle français couramment chaque matin.",
-                prompt: "أتمم الجملة في زمن المضارع (Présent):",
+                prompt: "أتمم الجملة في زمن المضارع:",
                 sentence: "Nous [...] (aimer) voyager en Europe.",
-                options: ["aimons", "aimez", "aiment", "aimons-nous"],
+                options: ["aimons", "aimez", "aiment"],
                 answer: "aimons"
             },
             {
                 tense: "Passé Composé",
-                example: "Hier, j'ai visité un musée magnifique à Paris.",
                 exampleFr: "Hier, j'ai visité un musée magnifique à Paris.",
-                prompt: "اختر التصريف الصحيح في الماضي المركب (Passé Composé):",
+                prompt: "اختر التصريف الصحيح في الماضي المركب:",
                 sentence: "Elle [...] (venir) avec nous hier soir.",
-                options: ["est venue", "a venu", "est venu", "a vendue"],
+                options: ["est venue", "a venu", "est venu"],
                 answer: "est venue"
             },
             {
                 tense: "Imparfait",
-                example: "Quand j'étais enfant, je jouais au football tous les jours.",
                 exampleFr: "Quand j'étais enfant, je jouais au football.",
-                prompt: "حدد التصريف المناسب في زمن الماضي المستمر (Imparfait):",
+                prompt: "حدد التصريف المناسب في الماضي المستمر:",
                 sentence: "Tu [...] (avoir) une belle voiture rouge autrefois.",
-                options: ["avais", "avais eu", "avais as", "aviez"],
+                options: ["avais", "avais eu", "aviez"],
                 answer: "avais"
             },
             {
                 tense: "Futur Simple",
-                example: "Demain, nous voyagerons vers une nouvelle destination.",
                 exampleFr: "Demain, nous voyagerons vers une nouvelle destination.",
-                prompt: "اختر التصريف الصحيح في المستقبل البسيط (Futur Simple):",
+                prompt: "اختر التصريف الصحيح في المستقبل البسيط:",
                 sentence: "Ils [...] (faire) leurs devoirs ce soir.",
-                options: ["feront", "faires", "font", "ferons"],
+                options: ["feront", "faires", "font"],
                 answer: "feront"
-            },
-            {
-                tense: "Futur Proche",
-                example: "Regarde ces nuages, il va pleuvoir bientôt.",
-                exampleFr: "Regarde ces nuages, il va pleuvoir bientôt.",
-                prompt: "اختر التعبير الأصح للمستقبل القريب (Futur Proche):",
-                sentence: "Je [...] (manger) un gâteau au chocolat.",
-                options: ["vais manger", "vais mange", "aller manger", "suis manger"],
-                answer: "vais manger"
-            },
-            {
-                tense: "Plus-que-parfait",
-                example: "Quand il est arrivé, le train était déjà parti.",
-                exampleFr: "Quand il est arrivé, le train était déjà parti.",
-                prompt: "اختر التصريف المناسب في زمن (Plus-que-parfait):",
-                sentence: "Nous [...] (finir) notre travail avant midi.",
-                options: avions_fini = ["avions fini", "étions finis", "avons fini", "avions finis"],
-                options: ["avions fini", "étions finis", "avons fini", "avions finis"],
-                answer: "avions fini"
-            },
-            {
-                tense: "Conditionnel Présent",
-                example: "Si j'avais de l'argent, j'achèterais une grande maison.",
-                exampleFr: "Si j'avais de l'argent, j'achèterais une grande maison.",
-                prompt: "اختر الفعل المناسب في صيغة الشرط المضارع (Conditionnel):",
-                sentence: "Tu [...] (pouvoir) m'aider s'il te plaît ?",
-                options: ["pourrais", "peux", "pourras", "pouvais"],
-                answer: "pourrais"
-            },
-            {
-                tense: "Subjonctif Présent",
-                example: "Il faut que tu étudies bien pour réussir ton examen.",
-                exampleFr: "Il faut que tu étudies bien pour réussir.",
-                prompt: "اختر التصريف الصحيح في صيغة الشك (Subjonctif):",
-                sentence: "Il faut que nous [...] (partir) maintenant.",
-                options: ["partions", "partons", "partiez", "partent"],
-                answer: "partions"
             }
         ];
 
@@ -407,59 +337,73 @@
         let selectedOption = null;
         let isAnswerSubmitted = false;
 
-        const progressFill = document.getElementById('progress-fill');
-        const tenseBadge = document.getElementById('tense-badge');
-        const questionPrompt = document.getElementById('question-prompt');
-        const exampleText = document.getElementById('example-text');
-        const optionsGrid = document.getElementById('options-grid');
-        const footerFeedback = document.getElementById('footer-feedback');
-        const feedbackMessage = document.getElementById('feedback-message');
-        const nextBtn = document.getElementById('next-btn');
-        const quizScreen = document.getElementById('quiz-screen');
-        const quizHeader = document.getElementById('quiz-header');
-        const resultsScreen = document.getElementById('results-screen');
-        const finalScoreText = document.getElementById('final-score-text');
+        // نظام توليد الأصوات (نجاح / خطأ) بدون الحاجة لملفات خارجية
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playSound(type) {
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+
+            if (type === 'correct') {
+                // صوت نجاح (نغمة صاعدة مبهجة)
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(440, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.15);
+                gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.3);
+            } else {
+                // صوت خطأ (نغمة منخفضة تحذيرية)
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(180, audioCtx.currentTime);
+                osc.frequency.setValueAtTime(120, audioCtx.currentTime + 0.1);
+                gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.3);
+            }
+        }
 
         function loadQuestion() {
             isAnswerSubmitted = false;
             selectedOption = null;
-            footerFeedback.classList.add('hidden');
-            footerFeedback.classList.remove('correct-bg', 'incorrect-bg');
+            document.getElementById('footer-feedback').classList.add('hidden');
+            document.getElementById('footer-feedback').classList.remove('correct-bg', 'incorrect-bg');
+            
+            const nextBtn = document.getElementById('next-btn');
             nextBtn.textContent = "تحقق";
             nextBtn.className = "action-btn";
 
             const q = quizData[currentQuestionIndex];
-            
-            // تحديث شريط التقدم
-            const progressPercent = ((currentQuestionIndex) / quizData.length) * 100;
-            progressFill.style.width = `${progressPercent}%`;
+            const progressPercent = (currentQuestionIndex / quizData.length) * 100;
+            document.getElementById('progress-fill').style.width = `${progressPercent}%`;
 
-            tenseBadge.textContent = q.tense;
-            questionPrompt.innerHTML = `${q.prompt}<br><strong style="font-size: 22px; color: #2b2b2b; display: block; margin-top: 10px; direction: ltr; text-align: left;">${q.sentence}</strong>`;
-            exampleText.textContent = q.exampleFr;
+            document.getElementById('tense-badge').textContent = q.tense;
+            document.getElementById('question-prompt').innerHTML = `${q.prompt}<br><strong style="font-size: 20px; color: #2b2b2b; display: block; margin-top: 10px; direction: ltr; text-align: left;">${q.sentence}</strong>`;
+            document.getElementById('example-text').textContent = q.exampleFr;
 
-            // خلط الخيارات عشوائياً بطريقة بسيطة
             const shuffledOptions = [...q.options].sort(() => Math.random() - 0.5);
-
+            const optionsGrid = document.getElementById('options-grid');
             optionsGrid.innerHTML = '';
+
             shuffledOptions.forEach(option => {
                 const btn = document.createElement('button');
                 btn.className = 'option-btn';
                 btn.textContent = option;
-                btn.onclick = () => selectOption(btn, option);
+                btn.onclick = () => {
+                    if (isAnswerSubmitted) return;
+                    document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+                    btn.classList.add('selected');
+                    selectedOption = option;
+                };
                 optionsGrid.appendChild(btn);
             });
-        }
-
-        function selectOption(buttonElement, optionText) {
-            if (isAnswerSubmitted) return;
-
-            document.querySelectorAll('.option-btn').forEach(btn => {
-                btn.classList.remove('selected');
-            });
-
-            buttonElement.classList.add('selected');
-            selectedOption = optionText;
         }
 
         function handleNextButton() {
@@ -469,13 +413,12 @@
             }
 
             if (!isAnswerSubmitted) {
-                // مرحلة التحقق من الإجابة
                 isAnswerSubmitted = true;
                 const currentQ = quizData[currentQuestionIndex];
                 const buttons = document.querySelectorAll('.option-btn');
-
                 let isCorrect = (selectedOption === currentQ.answer);
 
+                // تلوين الأزرار وتفعيل الصوت المناسب
                 buttons.forEach(btn => {
                     if (btn.textContent === currentQ.answer) {
                         btn.classList.add('correct');
@@ -484,49 +427,49 @@
                     }
                 });
 
+                const footerFeedback = document.getElementById('footer-feedback');
+                const feedbackMessage = document.getElementById('feedback-message');
+                const nextBtn = document.getElementById('next-btn');
+
                 if (isCorrect) {
                     score++;
+                    playSound('correct'); // تشغيل صوت النجاح
                     footerFeedback.className = 'footer-feedback correct-bg';
                     feedbackMessage.textContent = 'إجابة صحيحة! 🎉';
+                    nextBtn.className = "action-btn";
                 } else {
+                    playSound('error'); // تشغيل صوت الخطأ
                     footerFeedback.className = 'footer-feedback incorrect-bg';
-                    feedbackMessage.textContent = `إجابة خاطئة! الصواب هو: ${currentQ.answer}`;
+                    feedbackMessage.textContent = `إجابة خاطئة! الصواب: ${currentQ.answer}`;
+                    nextBtn.className = "action-btn incorrect-btn";
                 }
 
                 footerFeedback.classList.remove('hidden');
                 nextBtn.textContent = "متابعة";
-                nextBtn.className = isCorrect ? "action-btn" : "action-btn incorrect-btn";
-
             } else {
-                // الانتقال للسؤال الموالي أو النتائج
                 currentQuestionIndex++;
                 if (currentQuestionIndex < quizData.length) {
                     loadQuestion();
                 } else {
-                    showResults();
+                    document.getElementById('quiz-header').style.display = 'none';
+                    document.getElementById('quiz-screen').style.display = 'none';
+                    document.getElementById('footer-feedback').style.display = 'none';
+                    document.getElementById('results-screen').style.display = 'flex';
+                    document.getElementById('final-score-text').textContent = `لقد أجبت على ${score} من ${quizData.length} إجابة صحيحة بشكل ممتاز!`;
                 }
             }
-        }
-
-        function showResults() {
-            quizHeader.style.display = 'none';
-            quizScreen.style.display = 'none';
-            footerFeedback.style.display = 'none';
-            resultsScreen.style.display = 'flex';
-            finalScoreText.textContent = `لقد أجبت على ${score} من ${quizData.length} إجابة صحيحة بشكل ممتاز!`;
         }
 
         function restartQuiz() {
             currentQuestionIndex = 0;
             score = 0;
-            quizHeader.style.display = 'flex';
-            quizScreen.style.display = 'flex';
-            footerFeedback.style.display = 'flex';
-            resultsScreen.style.display = 'none';
+            document.getElementById('quiz-header').style.display = 'flex';
+            document.getElementById('quiz-screen').style.display = 'flex';
+            document.getElementById('footer-feedback').style.display = 'flex';
+            document.getElementById('results-screen').style.display = 'none';
             loadQuestion();
         }
 
-        // تشغيل التطبيق عند التحميل
         window.onload = loadQuestion;
     </script>
 </body>
