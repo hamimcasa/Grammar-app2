@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiz des Temps Français | DuoStyle</title>
+    <title>Quiz des Temps Français | DuoStyle & Admin</title>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -50,6 +50,7 @@
             flex-direction: column;
             border: 2px solid var(--border);
             margin: 15px;
+            position: relative;
         }
 
         .header {
@@ -77,13 +78,12 @@
             transition: width 0.4s ease;
         }
 
-        .close-btn {
+        .admin-trigger-btn {
             background: none;
             border: none;
-            font-size: 20px;
-            color: var(--text-muted);
+            font-size: 16px;
             cursor: pointer;
-            font-weight: 800;
+            padding: 5px;
         }
 
         .quiz-body {
@@ -93,16 +93,30 @@
             flex-direction: column;
         }
 
+        .badges-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
         .tense-badge {
-            align-self: flex-start;
             background-color: #ddf4ff;
             color: var(--secondary-dark);
             padding: 5px 12px;
             border-radius: 20px;
             font-size: 13px;
             font-weight: 700;
-            margin-bottom: 15px;
             text-transform: uppercase;
+        }
+
+        .group-badge {
+            background-color: #fef08a;
+            color: #854d0e;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
         }
 
         .question-title {
@@ -178,13 +192,10 @@
             color: var(--danger-dark) !important;
         }
 
-        .results-screen {
+        .results-screen, .admin-screen {
             display: none;
             flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 40px 20px;
-            text-align: center;
+            padding: 25px 20px;
             flex-grow: 1;
         }
 
@@ -198,6 +209,17 @@
             font-size: 16px;
             font-weight: 800;
             cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .admin-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            margin-bottom: 12px;
+            font-size: 15px;
         }
 
         .hidden {
@@ -209,37 +231,73 @@
 
     <div class="container">
         <div class="header" id="quiz-header">
-            <button class="close-btn" onclick="restartQuiz()">✕</button>
+            <button class="admin-trigger-btn" onclick="openAdminPanel()">⚙️</button>
             <div class="progress-bar-container">
                 <div class="progress-bar-fill" id="progress-fill"></div>
             </div>
         </div>
 
+        <!-- شاشة الكويز -->
         <div class="quiz-body" id="quiz-screen">
-            <div class="tense-badge" id="tense-badge">Présent de l'indicatif</div>
+            <div class="badges-row">
+                <div class="tense-badge" id="tense-badge">Présent</div>
+                <div class="group-badge" id="group-badge">1er groupe</div>
+            </div>
             <div class="question-title">اختر التصريف الصحيح للجملة:</div>
             <div class="question-subtitle" id="question-prompt"></div>
 
             <div class="example-box" id="example-box">
-                <strong>مثال توضيحي على الزمن:</strong>
+                <strong>مثال توضيحي:</strong>
                 <span id="example-text"></span>
             </div>
 
             <div class="options-grid" id="options-grid"></div>
         </div>
 
+        <!-- شاشة النتائج -->
         <div class="results-screen" id="results-screen">
-            <div style="font-size: 60px; margin-bottom: 20px;">🏆</div>
-            <div style="font-size: 24px; font-weight: 800; margin-bottom: 10px;">انتهى الاختبار بنجاح!</div>
-            <div style="font-size: 16px; color: var(--text-muted); margin-bottom: 20px;" id="final-score-text"></div>
+            <div style="font-size: 60px; margin-bottom: 20px; text-align: center;">🏆</div>
+            <div style="font-size: 24px; font-weight: 800; margin-bottom: 10px; text-align: center;">انتهى الاختبار بنجاح!</div>
+            <div style="font-size: 16px; color: var(--text-muted); margin-bottom: 20px; text-align: center;" id="final-score-text"></div>
             <button class="action-btn" onclick="restartQuiz()">إعادة الاختبار</button>
+            <button class="action-btn" style="background-color: var(--secondary); border-bottom-color: var(--secondary-dark);" onclick="exitAdminToQuiz()">العودة للرئيسية</button>
+        </div>
+
+        <!-- لوحة التحكم (Admin Panel) -->
+        <div class="admin-screen" id="admin-screen">
+            <div style="font-size: 20px; font-weight: 800; margin-bottom: 15px; color: #3c3c3c;">لوحة التحكم (Admin Panel)</div>
+            
+            <div id="admin-login-box">
+                <p style="margin-bottom: 10px; font-size: 14px;">أدخل رمز المرور (1234):</p>
+                <input type="password" id="admin-pass-input" class="admin-input" placeholder="الرمز السرّي">
+                <button class="action-btn" onclick="verifyAdminPassword()">دخول</button>
+                <button class="action-btn" style="background-color: var(--text-muted); border-bottom-color: #888;" onclick="exitAdminToQuiz()">إلغاء</button>
+            </div>
+
+            <div id="admin-dashboard" class="hidden">
+                <p style="font-weight: 700; margin-bottom: 10px; color: var(--primary-dark);">إضافة سؤال جديد:</p>
+                <input type="text" id="new-tense" class="admin-input" placeholder="الزمن (مثال: Présent de l'indicatif)">
+                <select id="new-group" class="admin-input">
+                    <option value="1er groupe">1er groupe</option>
+                    <option value="2e groupe">2e groupe</option>
+                    <option value="3e groupe">3e groupe</option>
+                </select>
+                <input type="text" id="new-sentence" class="admin-input" placeholder="الجملة مع [...] (مثال: Nous [...] (finir))">
+                <input type="text" id="new-answer" class="admin-input" placeholder="الإجابة الصحيحة (مثال: finissons)">
+                <input type="text" id="new-options" class="admin-input" placeholder="الخيارات الخاطئة مفصولتان بفاصلة (مثال: finissz, finissent)">
+                <input type="text" id="new-example" class="admin-input" placeholder="مثال توضيحي فرنسي">
+                
+                <button class="action-btn" onclick="addNewQuestion()">حفظ وإضافة السؤال</button>
+                <button class="action-btn" style="background-color: var(--danger); border-bottom-color: var(--danger-dark);" onclick="exitAdminToQuiz()">خروج من لوحة التحكم</button>
+            </div>
         </div>
     </div>
 
     <script>
-        const quizData = [
+        let quizData = [
             {
                 tense: "Présent de l'indicatif",
+                group: "1er groupe",
                 exampleFr: "Je parle français couramment chaque matin.",
                 prompt: "أتمم الجملة في زمن المضارع:",
                 sentence: "Nous [...] (aimer) voyager en Europe.",
@@ -247,8 +305,18 @@
                 answer: "aimons"
             },
             {
+                tense: "Présent de l'indicatif",
+                group: "2e groupe",
+                exampleFr: "Nous finissons nos devoirs avant de sortir.",
+                prompt: "أتمم الجملة في زمن المضارع:",
+                sentence: "Tu [...] (finir) ton travail à l'heure.",
+                options: ["finis", "finit", "finissons"],
+                answer: "finis"
+            },
+            {
                 tense: "Passé Composé",
-                exampleFr: "Hier, j'ai visité un musée magnifique à Paris.",
+                group: "3e groupe",
+                exampleFr: "Hier, je suis venu te voir.",
                 prompt: "اختر التصريف الصحيح في الماضي المركب:",
                 sentence: "Elle [...] (venir) avec nous hier soir.",
                 options: ["est venue", "a venu", "est venu"],
@@ -256,15 +324,17 @@
             },
             {
                 tense: "Imparfait",
-                exampleFr: "Quand j'étais enfant, je jouais au football.",
+                group: "3e groupe",
+                exampleFr: "Quand j'étais enfant, j'avais un chien.",
                 prompt: "حدد التصريف المناسب في الماضي المستمر:",
-                sentence: "Tu [...] (avoir) une belle voiture rouge autrefois.",
+                sentence: "Tu [...] (avoir) une belle voiture rouge.",
                 options: ["avais", "avais eu", "aviez"],
                 answer: "avais"
             },
             {
                 tense: "Futur Simple",
-                exampleFr: "Demain, nous voyagerons vers une nouvelle destination.",
+                group: "3e groupe",
+                exampleFr: "Demain, nous ferons du sport.",
                 prompt: "اختر التصريف الصحيح في المستقبل البسيط:",
                 sentence: "Ils [...] (faire) leurs devoirs ce soir.",
                 options: ["feront", "faires", "font"],
@@ -313,14 +383,17 @@
             document.getElementById('progress-fill').style.width = `${progressPercent}%`;
 
             document.getElementById('tense-badge').textContent = q.tense;
+            document.getElementById('group-badge').textContent = q.group;
             document.getElementById('question-prompt').innerHTML = `${q.prompt}<br><strong style="font-size: 20px; color: #2b2b2b; display: block; margin-top: 10px; direction: ltr; text-align: left;">${q.sentence}</strong>`;
             document.getElementById('example-text').textContent = q.exampleFr;
 
-            const shuffledOptions = [...q.options].sort(() => Math.random() - 0.5);
+            let allOptions = [...q.options, q.answer];
+            allOptions.sort(() => Math.random() - 0.5);
+
             const optionsGrid = document.getElementById('options-grid');
             optionsGrid.innerHTML = '';
 
-            shuffledOptions.forEach(option => {
+            allOptions.forEach(option => {
                 const btn = document.createElement('button');
                 btn.className = 'option-btn';
                 btn.textContent = option;
@@ -352,7 +425,6 @@
                 playSound('error');
             }
 
-            // الانتقال التلقائي للسؤال الموالي بعد ثانية ونصف (1.5 ثانية)
             setTimeout(() => {
                 currentQuestionIndex++;
                 if (currentQuestionIndex < quizData.length) {
@@ -375,7 +447,76 @@
             loadQuestion();
         }
 
+        function openAdminPanel() {
+            document.getElementById('quiz-screen').style.display = 'none';
+            document.getElementById('results-screen').style.display = 'none';
+            document.getElementById('admin-screen').style.display = 'flex';
+            document.getElementById('admin-login-box').style.display = 'block';
+            document.getElementById('admin-dashboard').style.display = 'none';
+            document.getElementById('admin-pass-input').value = '';
+        }
+
+        function verifyAdminPassword() {
+            const pass = document.getElementById('admin-pass-input').value;
+            if (pass === '1234') {
+                document.getElementById('admin-login-box').style.display = 'none';
+                document.getElementById('admin-dashboard').style.display = 'block';
+            } else {
+                alert('رمز المرور خاطئ!');
+            }
+        }
+
+        function exitAdminToQuiz() {
+            document.getElementById('admin-screen').style.display = 'none';
+            document.getElementById('results-screen').style.display = 'none';
+            document.getElementById('quiz-header').style.display = 'flex';
+            document.getElementById('quiz-screen').style.display = 'flex';
+            if (currentQuestionIndex >= quizData.length) {
+                currentQuestionIndex = 0;
+                score = 0;
+            }
+            loadQuestion();
+        }
+
+        function addNewQuestion() {
+            const tense = document.getElementById('new-tense').value.trim();
+            const group = document.getElementById('new-group').value;
+            const sentence = document.getElementById('new-sentence').value.trim();
+            const answer = document.getElementById('new-answer').value.trim();
+            const optionsInput = document.getElementById('new-options').value.trim();
+            const exampleFr = document.getElementById('new-example').value.trim();
+
+            if (!tense || !sentence || !answer || !optionsInput) {
+                alert('المرجو ملء جميع الحقول الضرورية!');
+                return;
+            }
+
+            const options = optionsInput.split(',').map(item => item.trim());
+
+            quizData.push({
+                tense: tense,
+                group: group,
+                exampleFr: exampleFr || "Exemple par défaut.",
+                prompt: "أتمم الجملة:",
+                sentence: sentence,
+                options: options,
+                answer: answer
+            });
+
+            alert('تمت إضافة السؤال بنجاح!');
+            document.getElementById('new-tense').value = '';
+            document.getElementById('new-sentence').value = '';
+            document.getElementById('new-answer').value = '';
+            document.getElementById('new-options').value = '';
+            document.getElementById('new-example').value = '';
+            
+            exitAdminToQuiz();
+        }
+
         window.onload = loadQuestion;
     </script>
 </body>
 </html>
+```[file-tag: code-generated-file-977fa6ea-6b8a-47c7-bdef-c519e3b22f08]
+
+قم بنسخ هذا الكود بالكامل وتحديث ملف `index.html` في مستودع `Grammar-app2`، وكل شيء سيعمل لديك بأفضل شكل ممكن!
