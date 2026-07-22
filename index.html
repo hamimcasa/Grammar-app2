@@ -5,21 +5,78 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quiz des Temps Français | DuoStyle & Admin</title>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <!-- ربط ملف الـ CSS الخارجي -->
+    <!-- ربط ملف التنسيقات الخارجي -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <div class="container">
         <div class="header" id="quiz-header">
+            <button class="admin-trigger-btn" onclick="openAdminPanel()">⚙️</button>
             <div class="progress-bar-container">
-                <div class="progress-bar-fill"></div>
+                <div class="progress-bar-fill" id="progress-fill"></div>
+            </div>
+        </div>
+
+        <!-- شاشة الكويز -->
+        <div class="quiz-body" id="quiz-screen">
+            <div class="badges-row">
+                <div class="tense-badge" id="tense-badge">Présent</div>
+                <div class="group-badge" id="group-badge">1er groupe</div>
+            </div>
+            <div class="question-title">اختر التصريف الصحيح للجملة:</div>
+            <div class="question-subtitle" id="question-prompt"></div>
+
+            <div class="example-box" id="example-box">
+                <strong>مثال توضيحي:</strong>
+                <span id="example-text"></span>
+            </div>
+
+            <div class="options-grid" id="options-grid"></div>
+        </div>
+
+        <!-- شاشة النتائج -->
+        <div class="results-screen" id="results-screen">
+            <div style="font-size: 60px; margin-bottom: 20px; text-align: center;">🏆</div>
+            <div style="font-size: 24px; font-weight: 800; margin-bottom: 10px; text-align: center;">انتهى الاختبار بنجاح!</div>
+            <div style="font-size: 16px; color: var(--text-muted); margin-bottom: 20px; text-align: center;" id="final-score-text"></div>
+            <button class="action-btn" onclick="restartQuiz()">إعادة الاختبار</button>
+            <button class="action-btn" style="background-color: var(--secondary); border-bottom-color: var(--secondary-dark);" onclick="exitAdminToQuiz()">العودة للرئيسية</button>
+        </div>
+
+        <!-- لوحة التحكم (Admin Panel) -->
+        <div class="admin-screen" id="admin-screen">
+            <div style="font-size: 20px; font-weight: 800; margin-bottom: 15px; color: #3c3c3c;">لوحة التحكم (Admin Panel)</div>
+            
+            <div id="admin-login-box">
+                <p style="margin-bottom: 10px; font-size: 14px;">أدخل رمز المرور (1234):</p>
+                <input type="password" id="admin-pass-input" class="admin-input" placeholder="الرمز السرّي">
+                <button class="action-btn" onclick="verifyAdminPassword()">دخول</button>
+                <button class="action-btn" style="background-color: var(--text-muted); border-bottom-color: #888;" onclick="exitAdminToQuiz()">إلغاء</button>
+            </div>
+
+            <div id="admin-dashboard" class="hidden">
+                <p style="font-weight: 700; margin-bottom: 10px; color: var(--primary-dark);">إضافة سؤال جديد:</p>
+                <input type="text" id="new-tense" class="admin-input" placeholder="الزمن (مثال: Présent de l'indicatif)">
+                <select id="new-group" class="admin-input">
+                    <option value="1er groupe">1er groupe</option>
+                    <option value="2e groupe">2e groupe</option>
+                    <option value="3e groupe">3e groupe</option>
+                </select>
+                <input type="text" id="new-sentence" class="admin-input" placeholder="الجملة مع [...] (مثال: Nous [...] (finir))">
+                <input type="text" id="new-answer" class="admin-input" placeholder="الإجابة الصحيحة (مثال: finissons)">
+                <input type="text" id="new-options" class="admin-input" placeholder="الخيارات الخاطئة مفصولتان بفاصلة (مثال: finissz, finissent)">
+                <input type="text" id="new-example" class="admin-input" placeholder="مثال توضيحي فرنسي">
+                
+                <button class="action-btn" onclick="addNewQuestion()">حفظ وإضافة السؤال</button>
+                <button class="action-btn" style="background-color: var(--danger); border-bottom-color: var(--danger-dark);" onclick="exitAdminToQuiz()">خروج من لوحة التحكم</button>
             </div>
         </div>
     </div>
 
-    <!-- ربط ملفات الجافا سكريبت الخارجية في نهاية الصفحة -->
+    <!-- ربط ملفات الجافا سكريبت بالترتيب الصحيح -->
     <script src="questions.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
+
